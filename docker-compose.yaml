@@ -1,0 +1,265 @@
+version: "3.6"
+
+networks:
+  frontend:
+  backend:
+services:
+  keycloak:
+    image: jboss/keycloak:12.0.4
+    labels:
+      - "traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+    networks:
+      - backend
+    ports:
+      - "${KEYCLOAK_EXT_PORT}:8080"
+    environment:
+      - KEYCLOAK_USER=authadmin
+      - KEYCLOAK_PASSWORD=cd3f3ns3
+      - DB_ADDR=db
+      - DB_PORT=5432
+      - DB_DATABASE=cdefense
+      - DB_USER=cdefense
+      - DB_PASSWORD=cd3f3ns3
+      - DB_VENDOR=postgres
+      - KEYCLOAK_LOGLEVEL=INFO
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/auth/realms/master" ]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      - db
+  authservice:
+    image: cdefense/auth-service:${CD_RELEASE_TAG}
+    labels:
+      - "traefik.http.routers.authservice.rule=PathPrefix(`/cd-auth`)"
+      - "traefik.http.services.authservice.loadbalancer.server.port=8080"
+    networks:
+      - backend
+    ports:
+      - "${AUTHSERVICE_EXT_PORT}:8080"
+    environment:
+      - MICRONAUT_SECURITY_TOKEN_JWT_SIGNATURES_JWKS_KEYCLOAK_URL=http://keycloak:8080/auth/realms/cdefense/protocol/openid-connect/certs
+      - CLOUDDEFENSE_AUTH_KEYCLOAK_REALM_KEY=cdefense
+      - CLOUDDEFENSE_HASURA_ADMIN_SECRET=cd3f3ns3
+      - CLOUDDEFENSE_AUTH_KEYCLOAK_URL=http://keycloak:8080/auth
+      - CLOUDDEFENSE_HEROKUAPP_GRAPHQL_URL=http://graphql:8080/v1/graphql
+      - CLOUDDEFENSE_AUTH_DEPLOYMENT_MODE_DOCKER=true
+      - CLOUDDEFENSE_AUTH_KEYCLOAK_ADMIN_USER=authadmin
+      - CLOUDDEFENSE_AUTH_KEYCLOAK_ADMIN_PASSWORD=cd3f3ns3
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "127.0.0.1", "8080" ]
+      interval: 30s
+      timeout: 3s
+    depends_on:
+      - keycloak
+  db:
+    image: postgres:12
+    networks:
+      - backend
+    volumes:
+      - "dbdata:/var/lib/postgresql/data"
+    ports:
+      - "${DB_EXT_PORT}:5432"
+    environment:
+      - POSTGRES_DB=cdefense
+      - POSTGRES_USER=cdefense
+      - POSTGRES_PASSWORD=cd3f3ns3
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "cdefense"]
+      interval: 30s
+      timeout: 3s
+  graphql:
+    image: cdefense/graphql:${CD_RELEASE_TAG}
+    labels:
+      - "traefik.http.routers.graphql.rule=PathPrefix(`/v1/graphql`) || PathPrefix(`/v1alpha1/`) || PathPrefix(`/console/`) || PathPrefix(`/v1/query`)"
+      - "traefik.http.services.graphql.loadbalancer.server.port=8080"
+    networks:
+      - backend
+      - frontend
+    ports:
+      - "${GRAPHQL_EXT_PORT}:8080"
+    environment:
+      - HASURA_GRAPHQL_DATABASE_URL=postgres://cdefense:cd3f3ns3@db:5432/cdefense
+      - HASURA_GRAPHQL_ENABLE_CONSOLE=true
+      - HASURA_GRAPHQL_ADMIN_SECRET=cd3f3ns3
+      - 'HASURA_GRAPHQL_JWT_SECRET={
+        "type": "RS256",
+        "jwk_url": "http://keycloak:8080/auth/realms/cdefense/protocol/openid-connect/certs"
+        }'
+      - HASURA_GRAPHQL_UNAUTHORIZED_ROLE=anonymous
+      - HASURA_GRAPHQL_NO_OF_RETRIES=10
+      - HASURA_GRAPHQL_ENABLE_TELEMETRY=false
+      - HASURA_GRAPHQL_DEV_MODE=true
+    restart: on-failure
+    healthcheck:
+      test:
+        [
+            "CMD",
+            "wget",
+            "--quiet",
+            "--spider",
+            "http://127.0.0.1:8080/v1/version",
+        ]
+      interval: 30s
+      timeout: 3s
+    depends_on:
+      - db
+      - authservice
+  seed:
+    image: cdefense/scandb-seed:local
+    networks:
+      - backend
+    volumes:
+      - "bootstrap:/bootstrap"
+    restart: on-failure
+    environment:
+      - PGHOST=db
+      - PGPORT=5432
+      - PGDATABASE=cdefense
+      - PGUSER=cdefense
+      - PGPASSWORD=cd3f3ns3
+    depends_on:
+      - graphql
+      - db
+    command: ["./wait-for", "graphql:8080", "--", "./seed_db.sh"]
+  api:
+    image: cdefense/scan-api:${CD_RELEASE_TAG}
+    labels:
+      - "traefik.http.routers.api.rule=Path(`/processAndSave`) || PathPrefix(`/scan/`) || PathPrefix(`/integration/`)"
+      - "traefik.http.services.api.loadbalancer.server.port=8080"
+    networks:
+      - backend
+    volumes:
+      - "bootstrap:/bootstrap"
+    restart: on-failure
+    ports:
+      - "${API_EXT_PORT}:8080"
+    environment:
+      - DB_CONNECTION_STRING=jdbc:postgresql://db:5432/cdefense
+      - DB_USER=cdefense
+      - MICRONAUT_SECURITY_ENABLED=true
+      - MICRONAUT_SECURITY_TOKEN_JWT_BEARER_ENABLED=true
+      - KEYCLOAK_ENABLED=true
+      - MICRONAUT_SECURITY_TOKEN_JWT_SIGNATURES_JWKS_KEYCLOAK_URL=http://keycloak:8080/auth/realms/cdefense/protocol/openid-connect/certs
+      - DB_PASSWORD=cd3f3ns3
+      - CLOUDDEFENSE_HEROKUAPP_GRAPHQL_URL=http://graphql:8080/v1/graphql
+      - HASURA_GRAPHQL_ADMIN_SECRET=cd3f3ns3
+      - CVE_LOOKUP_DB_TYPE=VFEED
+      - CLOUDDEFENSE_WEBCONSOLE_HOST_URL=http://${CD_SERVER_HOST}/project-details
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
+      interval: 30s
+      timeout: 3s
+    depends_on:
+      - graphql
+      - db
+    command: ["./run.sh"]
+  data:
+    image: cdefense/scan-data:${CD_RELEASE_TAG}
+    networks:
+      - backend
+    volumes:
+      - "bootstrap:/bootstrap"
+    restart: on-failure
+    ports:
+      - "${DATA_EXT_PORT}:8080"
+    environment:
+      - DB_CONNECTION_STRING=jdbc:postgresql://db:5432/cdefense
+      - DB_USER=cdefense
+      - DB_PASSWORD=cd3f3ns3
+      - CLOUDDEFENSE_HEROKUAPP_GRAPHQL_URL=http://graphql:8080/v1/graphql
+      - HASURA_GRAPHQL_ADMIN_SECRET=cd3f3ns3
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
+      interval: 30s
+      timeout: 3s
+    depends_on:
+      - graphql
+      - db
+    command: ["./run.sh"]
+  web:
+    image:  cdefense/web-console:${CD_RELEASE_TAG}
+    labels:
+      - "traefik.http.routers.web.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.web.priority=1"
+      - "traefik.http.services.web.loadbalancer.server.port=80"
+    networks:
+      - frontend
+    volumes:
+      - "bootstrap:/bootstrap"
+    restart: on-failure
+    ports:
+      - "${WEB_EXT_PORT}:80"
+    environment:
+      - GRAPHQL_ENDPOINT=http://${CD_SERVER_HOST}/v1/graphql
+      - AUTH_STAGE=dockerStaging
+      - CUBEJS_ENDPOINT=http://${CD_SERVER_HOST}/cubejs-api/v1
+      - CUBEJS_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      - API_ENDPOINT=http://${CD_SERVER_HOST}
+      - AUTH_ENDPOINT=http://${CD_SERVER_HOST}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "80"]
+      interval: 30s
+      timeout: 3s
+    depends_on:
+      - graphql
+    command: ["./wait-for", "graphql:8080", "--", "./run.sh"]
+  cube:
+    image: cdefense/cubejs-cd:${CD_RELEASE_TAG}
+    labels:
+      - "traefik.http.routers.cube.rule=PathPrefix(`/cubejs-api`)"
+      - "traefik.http.services.cube.loadbalancer.server.port=4000"
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - "bootstrap:/bootstrap"
+    restart: on-failure
+    ports:
+      - "${CUBE_EXT_PORT}:4000"
+    environment:
+      - CUBEJS_API_SECRET=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      - CUBEJS_DB_HOST=db
+      - CUBEJS_DB_NAME=cdefense
+      - CUBEJS_DB_USER=cdefense
+      - CUBEJS_DB_PASS=cd3f3ns3
+      - CUBEJS_DB_TYPE=postgres
+      - CUBEJS_CACHE_AND_QUEUE_DRIVER=memory
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "4000"]
+      interval: 30s
+      timeout: 3s
+    depends_on:
+      - db
+      - web
+    command: ["/usr/src/app/wait-for", "db:5432", "--", "node", "/usr/src/app/index.js"]
+  traefik:
+    image: traefik:v2.0
+    networks:
+      - frontend
+      - backend
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--log.level=INFO"
+    ports:
+      - "${TRAEFIK_PORT}:80"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
+      interval: 30s
+      timeout: 3s
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    depends_on:
+      - web
+      - cube
+      - api
+volumes:
+  bootstrap:
+  dbdata:
