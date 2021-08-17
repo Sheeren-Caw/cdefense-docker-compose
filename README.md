@@ -98,8 +98,19 @@ Clicking Next will register the organization and Log you in. Once the user is su
 
 
 ## Getting Started Page
-Follow the Getting Started page instructions to install CLI and start using the CloudDefense security stack.
-Happy Scanning!
+- Follow the Getting Started page instructions to install CLI and start using the CloudDefense security stack.
+- Add a new environment variable called SCAN_URL="http://cdefense.local" (or the whatever is the value for CD_SERVER_HOST in the .env file is). (Varies for Linux and Windows)
+
+### OSX/Linux
+Please put the below in your shell profile. 
+```
+export SCAN_URL="http://cdefense.local" 
+```
+
+### Windows 
+Coming soon .. 
+
+
 
 ![image](https://user-images.githubusercontent.com/1424635/129782217-d29a77d1-703a-4ef0-a705-288e1ae70a8f.png)
 
