@@ -81,12 +81,12 @@ Map the localhost IP to the domain name at which you would like to access the ru
 
 Once the environment is installed, access the  CloudDefnese console using the browser, as shown in the below screenshot. In this case, the host's IP (where the stack is installed) is mapped to cdefense.local domain. The CloudDefense console is accessible via URL http://cdefense.local/.
 
-##CloudDefense console Login page
+## CloudDefense console Login page
 Register a new organization by clicking on Don't have an account? Link. This will lead to the Organization registration page.
 
 ![image](https://user-images.githubusercontent.com/1424635/129782133-994a6768-b9aa-4a8f-b184-6731d5ee2d16.png)
 
-##CloudDefense organization registration page
+## CloudDefense organization registration page
 Fill in all the required details like Organization Name, User Name, Email Address, and Password to register the admin/master account for the setup. This will enable the Next action button.
 
 ![image](https://user-images.githubusercontent.com/1424635/129782154-ce57d0a7-cc8a-4c72-ad1e-ed54e0930805.png)
