@@ -25,6 +25,13 @@ and externa redirection of the application via the browser.
 
 ```
 
+### Hosts Entry
+![image](https://user-images.githubusercontent.com/1424635/129831148-9382bf30-9860-4379-9edf-43a6ef02eceb.png)
+
+### GCP Public IP (should match the above)
+![image](https://user-images.githubusercontent.com/1424635/129831167-5aa0f765-bc73-4947-b9e6-0995edba7f7c.png)
+
+
 ## Machine where browser is accessing the VM
 
 ```
