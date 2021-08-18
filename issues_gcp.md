@@ -2,6 +2,8 @@
 
 Maybe transient but encountered while running `docker-compose up` 
 
+Please run `docker-compose up` to continue again. 
+
 ```
 Status: Downloaded newer image for cdefense/cubejs-cd:release-3.4.2
 Pulling traefik (traefik:v2.0)...
