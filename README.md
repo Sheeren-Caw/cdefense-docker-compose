@@ -76,10 +76,14 @@ Map the localhost IP to the domain name at which you would like to access the ru
 
 ![image](https://user-images.githubusercontent.com/1424635/129781483-3334e76a-182e-4ea0-987a-7c1b35c9391f.png)
 
+In case of a cloud provider like GCP / AWS / Azure where you're spinning up VMs on the fly you need to map the public IP of the VM in the hosts file. 
+
 
 # Accessing the application
 
-Once the environment is installed, access the  CloudDefnese console using the browser, as shown in the below screenshot. In this case, the host's IP (where the stack is installed) is mapped to cdefense.local domain. The CloudDefense console is accessible via URL http://cdefense.local/.
+- Once the environment is installed, access the  CloudDefnese console using the browser, as shown in the below screenshot. In this case, the host's IP (where the stack is installed) is mapped to cdefense.local domain. The CloudDefense console is accessible via URL http://cdefense.local/.
+- In case of a cloud provider like GCP / AWS / Azure where you're spinning up VMs on the fly you need to map the public IP of the VM in the hosts file of the machine that's accessing the application via the browser. 
+
 
 ## CloudDefense console Login page
 Register a new organization by clicking on Don't have an account? Link. This will lead to the Organization registration page.
