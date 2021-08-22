@@ -17,9 +17,10 @@ Note: If we used the CD_SERVER_HOST as the public IP of the server itself, the /
 ### Google Cloud 
 - Ubuntu: docker-compose-ubuntu20-1 
 
-## Bare bones VM images
-If the customers don't pick the image with docker. We need manual steps to install docker. 
-- https://docs.docker.com/engine/install/ubuntu/
-- Go to "Set up the repository"
-- Then go to "Install Docker Engine"
-- Download docker-compose binary. 
+## Docker Installation (On the client for SAST, DAST) or for running the server. 
+### Mac
+- https://docs.docker.com/desktop/mac/install/
+### Windows 
+- https://docs.docker.com/desktop/windows/ 
+### Linux 
+- Many Flavors: https://docs.docker.com/engine/install/ 
