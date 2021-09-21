@@ -151,7 +151,11 @@ services:
       - CLOUDDEFENSE_HEROKUAPP_GRAPHQL_URL=http://graphql:8080/v1/graphql
       - HASURA_GRAPHQL_ADMIN_SECRET=cd3f3ns3
       - CVE_LOOKUP_DB_TYPE=VFEED
-      - CLOUDDEFENSE_WEBCONSOLE_HOST_URL=http://${CD_SERVER_HOST}/project-details
+      - CLOUDDEFENSE_WEBCONSOLE_HOST_URL: http://${CD_SERVER_HOST}/applications/general/details"
+      - CLOUDDEFENSE_WEBCONSOLE_CONTAINER_SCAN_URL: http://${CD_SERVER_HOST}/applications/container/details"
+      - CLOUDDEFENSE_WEBCONSOLE_TERRAFORM_SCAN_URL: http://${CD_SERVER_HOST}/applications/terraform/details"
+      - CLOUDDEFENSE_WEBCONSOLE_KUBERNETES_SCAN_URL: http://${CD_SERVER_HOST}/applications/kube/details"
+      - CLOUDDEFENSE_WEBCONSOLE_SERVERLESS_SCAN_URL: http://${CD_SERVER_HOST}/applications/serverless/details"
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
       interval: 30s
