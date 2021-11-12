@@ -266,4 +266,4 @@ services:
 
 volumes:
   bootstrap:
-  dbdata
+  dbdata:
