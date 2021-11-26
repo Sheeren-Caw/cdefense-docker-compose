@@ -47,9 +47,10 @@ Coming soon
 
 ## Download the required files
 
-The two files required for deploying the services using docker. Please download them to your server onto an indenpent directory and name it accordingly (example: clouddefense-onprem-services or anything your prefer) 
+The files required for deploying the services using docker are under the cdefense-docker-compose directory. Please download that directory to your server. It contains three files 
 1. docker-compose.yaml
 2. .env 
+3. default.env (duplicate of .env): This is because sometimes when you download a file starting with "." (.env) the cloud provider example Google Cloud doesn't show that on the file system if you use a GUI. You'll have to view hidden files using 'ls -a' 
 
 ## Docker Compose 
 
