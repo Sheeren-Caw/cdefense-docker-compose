@@ -207,7 +207,7 @@ services:
     environment:
       - GRAPHQL_ENDPOINT=http://${CD_SERVER_HOST}/v1/graphql
       - AUTH_STAGE=dockerStaging
-      - CUBEJS_ENDPOINT=http://${CD_SERVER_HOST}/cubejs-api/v1
+      - CUBEJS_ENDPOINT=http://${CD_SERVER_HOST}:4000/cubejs-api/v1
       - CUBEJS_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
       - API_ENDPOINT=http://${CD_SERVER_HOST}
       - AUTH_ENDPOINT=http://${CD_SERVER_HOST}
