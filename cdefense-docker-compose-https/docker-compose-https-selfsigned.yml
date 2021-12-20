@@ -156,6 +156,7 @@ services:
       - CLOUDDEFENSE_WEBCONSOLE_TERRAFORM_SCAN_URL=https://${CD_SERVER_HOST}/applications/terraform/details
       - CLOUDDEFENSE_WEBCONSOLE_KUBERNETES_SCAN_URL=https://${CD_SERVER_HOST}/applications/kube/details
       - CLOUDDEFENSE_WEBCONSOLE_SERVERLESS_SCAN_URL=https://${CD_SERVER_HOST}/applications/serverless/details
+      - DATA_VFEED_SQLITE_FULL_REFRESH_CRON_EXPRESSION=0 */2 * * *
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
       interval: 30s
@@ -179,6 +180,7 @@ services:
       - DB_PASSWORD=cd3f3ns3
       - CLOUDDEFENSE_HEROKUAPP_GRAPHQL_URL=http://graphql:8080/v1/graphql
       - HASURA_GRAPHQL_ADMIN_SECRET=cd3f3ns3
+      - VFEED_SYNC_JOB_CRON_EXPRESSION=0 */2 * * *
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
       interval: 30s
