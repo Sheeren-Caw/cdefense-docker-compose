@@ -158,7 +158,6 @@ services:
       - CLOUDDEFENSE_WEBCONSOLE_KUBERNETES_SCAN_URL=http://${CD_SERVER_HOST}/applications/kube/details
       - CLOUDDEFENSE_WEBCONSOLE_SERVERLESS_SCAN_URL=http://${CD_SERVER_HOST}/applications/serverless/details
       - DATA_VFEED_SQLITE_FULL_REFRESH_CRON_EXPRESSION=0 */2 * * *
-      - DATA_NVD_UPDATE_CRON_EXPRESSION=0 */2 * * *
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
       interval: 30s
@@ -211,6 +210,7 @@ services:
       - CUBEJS_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
       - API_ENDPOINT=http://${CD_SERVER_HOST}
       - AUTH_ENDPOINT=http://${CD_SERVER_HOST}
+      - ONPREM_ENABLED=cdefense
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "80"]
       interval: 30s
