@@ -158,7 +158,6 @@ services:
       - CLOUDDEFENSE_WEBCONSOLE_KUBERNETES_SCAN_URL=http://${CD_SERVER_HOST}/applications/kube/details
       - CLOUDDEFENSE_WEBCONSOLE_SERVERLESS_SCAN_URL=http://${CD_SERVER_HOST}/applications/serverless/details
       - DATA_VFEED_SQLITE_FULL_REFRESH_CRON_EXPRESSION=0 */2 * * *
-      - DATA_NVD_UPDATE_CRON_EXPRESSION=0 */2 * * *
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
       interval: 30s
@@ -205,12 +204,13 @@ services:
     ports:
       - "${WEB_EXT_PORT}:80"
     environment:
-      - GRAPHQL_ENDPOINT=http://${CD_SERVER_HOST}/v1/graphql
+      - GRAPHQL_ENDPOINT=http://${CD_SERVER_HOST}:${GRAPHQL_EXT_PORT}/v1/graphql
       - AUTH_STAGE=dockerStaging
-      - CUBEJS_ENDPOINT=http://${CD_SERVER_HOST}:4000/cubejs-api/v1
+      - CUBEJS_ENDPOINT=http://${CD_SERVER_HOST}:${CUBE_EXT_PORT}/cubejs-api/v1
       - CUBEJS_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-      - API_ENDPOINT=http://${CD_SERVER_HOST}
-      - AUTH_ENDPOINT=http://${CD_SERVER_HOST}
+      - API_ENDPOINT=http://${CD_SERVER_HOST}:${API_EXT_PORT}
+      - AUTH_ENDPOINT=http://${CD_SERVER_HOST}:${AUTHSERVICE_EXT_PORT}
+      - ONPREM_ENABLED=cdefense
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "80"]
       interval: 30s
