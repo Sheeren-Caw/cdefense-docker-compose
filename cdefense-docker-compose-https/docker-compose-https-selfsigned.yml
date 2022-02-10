@@ -255,16 +255,16 @@ services:
       - 80:80
       - 443:443
     environment:
-      - ENVSUBST_VARS=SERVER_DOMAIN
-      - SERVER_DOMAIN=cdefense.ddns.net
+        - NGINX_HOST=cdefense.devkraft.in
     volumes:
-      - ./conf:/etc/nginx/conf.d:rw
-      - ./ssl:/ssl/:rw
+      - ./templates:/etc/nginx/templates
+      - ./ssl:/etc/ssl
     depends_on:
       - web
     networks:
       - frontend
       - backend
+    # command: [bash, '/ssl/selfsigned-ssl-cert.sh']
 
 volumes:
   bootstrap:
