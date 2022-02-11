@@ -1,2 +1,2 @@
 # openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout privkey.pem -out fullchain.pem
-openssl req -x509 -nodes -days 365 -subj "/C=IN/ST=KR/O=CloudDefense/CN=cdefense.devkraft.in" -addext "subjectAltName=DNS:cdefense.devkraft.in" -newkey rsa:2048 -keyout ./ssl/private/nginx-selfsigned.key -out ./ssl/certs/nginx-selfsigned.crt
+openssl req -x509 -nodes -days 365 -subj "/C=IN/ST=KR/O=CloudDefense/CN=demo.cdefense.local" -addext "subjectAltName=DNS:demo.cdefense.local" -newkey rsa:2048 -keyout ./ssl/private/nginx-selfsigned.key -out ./ssl/certs/nginx-selfsigned.crt

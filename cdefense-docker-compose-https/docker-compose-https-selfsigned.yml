@@ -255,7 +255,7 @@ services:
       - 80:80
       - 443:443
     environment:
-        - NGINX_HOST=cdefense.devkraft.in
+        - NGINX_HOST=demo.cdefense.local
     volumes:
       - ./templates:/etc/nginx/templates
       - ./ssl:/etc/ssl
