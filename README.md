@@ -59,6 +59,8 @@ The files required for deploying the services using docker are under the cdefens
         ```
         cd ./cdefense-docker-compose-https
         ```
+    - Edit .env file
+        - `CD_SERVER_HOST=demo.cdefense.local`
     - Edit `docker-compose.yml` file
         - `CERTBOT_EMAIL=cddemo@clouddefense.ai`
         - `SERVER_DOMAIN=demo.cdefense.in`
@@ -78,6 +80,8 @@ The files required for deploying the services using docker are under the cdefens
 
         'bash selfsigned-ssl-cert.sh'
     - It will create a .cert file and private key in ssl folder
+    - Edit .env file
+        - `CD_SERVER_HOST=demo.cdefense.local`
     - Edit `docker-compose.yml` file
         - `NGINX_HOST=demo.cdefense.local`
     - bring up the service as a daemon
