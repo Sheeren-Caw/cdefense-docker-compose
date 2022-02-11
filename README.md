@@ -38,11 +38,6 @@ If you have a previous installation of the on Cloud Defense prem service running
 
 ![image](https://user-images.githubusercontent.com/1424635/129790772-f570384e-a33f-41e0-a186-87e1e46a6bda.png)
 
-
-
-#### Windows: 
-Coming soon 
-
 # Installation 
 
 ## Download the required files
@@ -55,11 +50,57 @@ The files required for deploying the services using docker are under the cdefens
 ## Docker Compose 
 
 ### Bring up the services as a daemon process
-``` 
-docker compose up -d 
-```
 
-This will bring up the environment. It will take few minutes to initialize the environment. Give it 5-10 minutes. One can watch the status of the environment by running the following command. 
+
+- Launch services with Let's Encrypt SSL certificate
+    - Add an A record (publicIP, Route) on a public DNS (Cloudflare, Route63 etc) for ex. publicIP, demo.cdefense.in (assuming one has ownership of the cdefense.in Domain Name)
+    - navigate to correct folder
+
+        ```
+        cd ./cdefense-docker-compose-https
+        ```
+    - Edit `docker-compose.yml` file
+        - `CERTBOT_EMAIL=cddemo@clouddefense.ai`
+        - `SERVER_DOMAIN=demo.cdefense.in`
+    - bring up the service as a daemon
+
+        ```
+        docker-compose up -d
+        ```
+- Launch services with self-signed SSL certificate
+    - navigate to correct folder
+
+        ```
+        cd ./cdefense-docker-compose-https
+        ```
+    - make required changed in `selfsigned-ssl-cert.sh` for ex. change the route demo.cdefense.local
+    - generate self-signed certificate
+
+        'bash selfsigned-ssl-cert.sh'
+    - It will create a .cert file and private key in ssl folder
+    - Edit `docker-compose.yml` file
+        - `NGINX_HOST=demo.cdefense.local`
+    - bring up the service as a daemon
+
+        ```
+        docker-compose -f docker-compose-https-selfsigned.yml up -d 
+        ```
+    - Edit the /etc/hosts file
+
+        ```
+        sudo nano /etc/hosts
+        ```
+
+        ```
+        127.0.0.1 demo.cdefense.local
+        ```
+    - go to route for ex. `https://demo.cdefense.local/`
+
+This will bring up the environment. 
+
+It will take few minutes to initialize the environment. Give it 5-10 minutes. One can watch the status of the environment by running the following command. 
+
+
 
 ```
 docker compose ps #(only containers specific to this docker compose up)
