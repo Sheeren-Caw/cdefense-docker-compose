@@ -50,7 +50,6 @@ services:
       - CLOUDDEFENSE_AUTH_DEPLOYMENT_MODE_DOCKER=true
       - CLOUDDEFENSE_AUTH_KEYCLOAK_ADMIN_USER=authadmin
       - CLOUDDEFENSE_AUTH_KEYCLOAK_ADMIN_PASSWORD=cd3f3ns3
-      - cdefense.domain=${CD_SERVER_HOST}
       - CLOUDDEFENSE_API_URL=http://api:8080
       - CLOUDDEFENSE_BASE_URL=http://${CD_SERVER_HOST}
     restart: on-failure
